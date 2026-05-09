@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Adın Soyadın — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@200;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #7a6228;
+      --black: #080808;
+      --black-mid: #111111;
+      --black-soft: #1a1a1a;
+      --white: #F5F0E8;
+      --white-dim: #c0b8a8;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CUSTOM CURSOR ── */
+    .cursor {
+      position: fixed; top: 0; left: 0;
+      width: 12px; height: 12px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform .1s, background .2s;
+    }
+    .cursor-ring {
+      position: fixed; top: 0; left: 0;
+      width: 36px; height: 36px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform .25s ease, width .3s, height .3s, opacity .3s;
+      opacity: 0.6;
+    }
+    body:hover .cursor { transform: translate(-50%,-50%) scale(1); }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: .35;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 500;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 28px 60px;
+      mix-blend-mode: normal;
+      transition: background .4s, padding .4s;
+    }
+    nav.scrolled {
+      background: rgba(8,8,8,0.92);
+      backdrop-filter: blur(12px);
+      padding: 18px 60px;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .72rem;
+      font-weight: 400;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--white-dim);
+      text-decoration: none;
+      position: relative;
+      transition: color .3s;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px; background: var(--gold);
+      transition: width .3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative; width: 100%; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-photo {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1400&q=80') center/cover no-repeat;
+      filter: brightness(.45) saturate(.6);
+      transform: scale(1.05);
+      animation: heroZoom 8s ease forwards;
+    }
+    @keyframes heroZoom {
+      from { transform: scale(1.1); }
+      to   { transform: scale(1.0); }
+    }
+
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        160deg,
+        rgba(8,8,8,0.3) 0%,
+        rgba(8,8,8,0.1) 40%,
+        rgba(8,8,8,0.6) 100%
+      );
+    }
+
+    .gold-line {
+      position: absolute; top: 0; left: 50%;
+      width: 1px; height: 0;
+      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+      animation: lineDrop 1.6s .5s ease forwards;
+    }
+    @keyframes lineDrop {
+      to { height: 100%; }
+    }
+
+    .hero-content {
+      position: relative; z-index: 10;
+      text-align: center;
+      animation: fadeUp .9s 1s both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .38em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .hero-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 9vw, 8rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--white);
+      text-shadow: 0 0 80px rgba(201,168,76,0.2);
+      margin-bottom: 24px;
+    }
+    .hero-name em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      font-weight: 300;
+      color: var(--white-dim);
+      letter-spacing: .08em;
+      margin-bottom: 48px;
+      max-width: 520px;
+      margin-inline: auto;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      padding: 14px 44px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: 'Montserrat', sans-serif;
+      font-size: .72rem;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      transition: color .4s;
+    }
+    .hero-cta::before {
+      content: ''; position: absolute; inset: 0;
+      background: var(--gold);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .4s;
+    }
+    .hero-cta:hover { color: var(--black); }
+    .hero-cta:hover::before { transform: scaleX(1); }
+    .hero-cta span { position: relative; z-index: 1; }
+
+    .scroll-indicator {
+      position: absolute; bottom: 36px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      animation: fadeUp .8s 2s both;
+    }
+    .scroll-indicator span {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .6rem; letter-spacing: .3em;
+      text-transform: uppercase; color: var(--gold-dim);
+    }
+    .scroll-arrow {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold-dim), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity: .3; transform: scaleY(1); }
+      50%      { opacity: 1;  transform: scaleY(1.2); }
+    }
+
+    /* ── ABOUT STRIP ── */
+    #about {
+      padding: 120px 60px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .about-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .65rem; letter-spacing: .35em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 20px; display: block;
+    }
+    .about-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 28px;
+    }
+    .about-heading em { font-style: italic; color: var(--gold); }
+    .about-text {
+      font-size: 1.15rem;
+      line-height: 1.85;
+      color: var(--white-dim);
+      font-weight: 300;
+    }
+    .about-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 40px; margin-top: 50px;
+    }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem; font-weight: 900;
+      color: var(--gold); line-height: 1;
+    }
+    .stat-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .65rem; letter-spacing: .25em;
+      text-transform: uppercase; color: var(--white-dim);
+      margin-top: 6px;
+    }
+    .about-img-wrap {
+      position: relative;
+    }
+    .about-img-wrap::before {
+      content: ''; position: absolute;
+      top: 20px; left: 20px; right: -20px; bottom: -20px;
+      border: 1px solid var(--gold-dim);
+    }
+    .about-img-wrap img {
+      width: 100%; aspect-ratio: 3/4; object-fit: cover;
+      position: relative; z-index: 1;
+      filter: saturate(.7) contrast(1.1);
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      text-align: center;
+      padding: 0 60px 80px;
+    }
+    .section-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .65rem; letter-spacing: .42em;
+      text-transform: uppercase; color: var(--gold);
+      display: block; margin-bottom: 18px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 900; line-height: 1.1;
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+    .section-divider {
+      width: 60px; height: 1px; background: var(--gold);
+      margin: 28px auto 0;
+    }
+
+    /* ── PROJECTS ── */
+    #projects {
+      padding: 120px 60px;
+      max-width: 1300px; margin: 0 auto;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 40px;
+    }
+
+    .project-card {
+      position: relative; overflow: hidden;
+      background: var(--black-mid);
+      border: 1px solid rgba(201,168,76,0.1);
+      opacity: 0;
+      transform: translateY(60px);
+      transition: opacity .7s ease, transform .7s ease, border-color .4s;
+    }
+    .project-card.visible {
+      opacity: 1; transform: translateY(0);
+    }
+    .project-card:nth-child(2) { transition-delay: .12s; }
+    .project-card:nth-child(3) { transition-delay: .24s; }
+    .project-card:nth-child(4) { transition-delay: .08s; }
+    .project-card:nth-child(5) { transition-delay: .2s; }
+    .project-card:nth-child(6) { transition-delay: .32s; }
+
+    .project-card:hover { border-color: var(--gold-dim); }
+
+    .project-img {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover;
+      transition: transform .7s ease, filter .5s;
+      filter: saturate(.5) brightness(.85);
+    }
+    .project-card:hover .project-img {
+      transform: scale(1.06);
+      filter: saturate(.8) brightness(1);
+    }
+
+    .project-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,8,8,0.9) 0%, transparent 55%);
+      opacity: 0; transition: opacity .4s;
+    }
+    .project-card:hover .project-overlay { opacity: 1; }
+
+    .project-info {
+      padding: 28px 32px;
+    }
+    .project-tag {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .6rem; letter-spacing: .3em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 10px; display: block;
+    }
+    .project-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700;
+      margin-bottom: 12px;
+      transition: color .3s;
+    }
+    .project-card:hover .project-title { color: var(--gold-light); }
+    .project-desc {
+      font-size: 1rem; color: var(--white-dim);
+      line-height: 1.7; font-weight: 300;
+    }
+    .project-link {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 22px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: .68rem; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--gold);
+      text-decoration: none;
+      transition: gap .3s;
+    }
+    .project-link:hover { gap: 16px; }
+    .project-link::after {
+      content: '→'; font-size: .9rem;
+    }
+
+    /* FEATURED card */
+    .project-card.featured {
+      grid-column: span 2;
+      display: grid; grid-template-columns: 1fr 1fr;
+    }
+    .project-card.featured .project-img {
+      height: 100%; aspect-ratio: unset;
+    }
+    .project-card.featured .project-info {
+      padding: 48px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .project-card.featured .project-title {
+      font-size: 2.2rem;
+    }
+
+    /* ── SKILLS ── */
+    #skills {
+      padding: 100px 60px;
+      background: var(--black-mid);
+      border-top: 1px solid rgba(201,168,76,0.1);
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+    }
+    .skills-inner { max-width: 1100px; margin: 0 auto; }
+    .skills-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 50px; margin-top: 0;
+    }
+    .skill-item {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity .6s, transform .6s;
+    }
+    .skill-item.visible { opacity: 1; transform: translateY(0); }
+    .skill-item:nth-child(2) { transition-delay: .1s; }
+    .skill-item:nth-child(3) { transition-delay: .2s; }
+    .skill-item:nth-child(4) { transition-delay: .15s; }
+    .skill-item:nth-child(5) { transition-delay: .25s; }
+    .skill-item:nth-child(6) { transition-delay: .35s; }
+
+    .skill-icon {
+      font-size: 1.8rem; margin-bottom: 18px; display: block;
+    }
+    .skill-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--gold-light);
+    }
+    .skill-desc {
+      font-size: .95rem; color: var(--white-dim);
+      line-height: 1.7; font-weight: 300;
+    }
+    .skill-bar-wrap {
+      margin-top: 14px; height: 2px;
+      background: rgba(201,168,76,0.15);
+    }
+    .skill-bar {
+      height: 100%; background: var(--gold);
+      width: 0; transition: width 1.2s ease;
+    }
+    .skill-item.visible .skill-bar { width: var(--w); }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: 140px 60px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    #contact::before {
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .contact-inner { max-width: 640px; margin: 0 auto; position: relative; }
+    .contact-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 900; line-height: 1.05;
+      margin-bottom: 28px;
+    }
+    .contact-title em { font-style: italic; color: var(--gold); }
+    .contact-sub {
+      font-size: 1.1rem; color: var(--white-dim);
+      line-height: 1.8; margin-bottom: 52px;
+    }
+    .contact-email {
+      display: inline-block;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      font-style: italic;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(201,168,76,0.4);
+      padding-bottom: 4px;
+      transition: border-color .3s, color .3s;
+      margin-bottom: 50px; display: block;
+    }
+    .contact-email:hover { color: var(--gold-light); border-color: var(--gold-light); }
+    .contact-socials { display: flex; justify-content: center; gap: 32px; }
+    .social-link {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .65rem; letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--white-dim); text-decoration: none;
+      transition: color .3s;
+    }
+    .social-link:hover { color: var(--gold); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 36px 60px;
+      border-top: 1px solid rgba(201,168,76,0.12);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: .95rem; color: var(--gold-dim);
+    }
+    .footer-copy {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .62rem; letter-spacing: .2em;
+      color: rgba(192,184,168,0.35);
+      text-transform: uppercase;
+    }
+
+    /* ── GOLD TICKER ── */
+    .ticker-wrap {
+      overflow: hidden;
+      border-top: 1px solid rgba(201,168,76,0.2);
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+      padding: 14px 0;
+      background: rgba(201,168,76,0.04);
+    }
+    .ticker-track {
+      display: flex; gap: 60px;
+      animation: ticker 22s linear infinite;
+      width: max-content;
+    }
+    .ticker-item {
+      font-family: 'Montserrat', sans-serif;
+      font-size: .68rem; letter-spacing: .35em;
+      text-transform: uppercase; color: var(--gold-dim);
+      white-space: nowrap;
+    }
+    .ticker-dot { color: var(--gold); margin: 0 6px; }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 22px 28px; }
+      nav.scrolled { padding: 14px 28px; }
+      .nav-links { gap: 22px; }
+      #about { grid-template-columns: 1fr; padding: 80px 28px; gap: 48px; }
+      .about-img-wrap { order: -1; }
+      #projects { padding: 80px 28px; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card.featured { grid-column: span 1; display: block; }
+      .project-card.featured .project-img { aspect-ratio: 4/3; }
+      #skills { padding: 80px 28px; }
+      .skills-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+      #contact { padding: 100px 28px; }
+      footer { padding: 28px; flex-direction: column; gap: 12px; text-align: center; }
+      .section-header { padding: 0 28px 60px; }
+    }
+    @media (max-width: 580px) {
+      .hero-name { font-size: 3rem; }
+      .nav-links { display: none; }
+      .skills-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">A.S.</a>
+  <ul class="nav-links">
+    <li><a href="#about">Hakkımda</a></li>
+    <li><a href="#projects">Projeler</a></li>
+    <li><a href="#skills">Yetenekler</a></li>
+    <li><a href="#contact">İletişim</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-photo"></div>
+  <div class="hero-overlay"></div>
+  <div class="gold-line"></div>
+
+  <div class="hero-content">
+    <span class="hero-eyebrow">Portfolio — 2025</span>
+    <h1 class="hero-name">Adın<br><em>Soyadın</em></h1>
+    <p class="hero-tagline">Tasarım, kod ve yaratıcılığın kesişiminde bir şeyler üretiyorum.</p>
+    <a href="#projects" class="hero-cta"><span>Projelerimi Gör</span></a>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Kaydır</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item">UI Tasarım<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Web Geliştirme<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Branding<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Ux Araştırma<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Mobil Uygulama<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Fotoğrafçılık<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Kreatif Yönetim<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">UI Tasarım<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Web Geliştirme<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Branding<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Ux Araştırma<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Mobil Uygulama<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Fotoğrafçılık<span class="ticker-dot">✦</span></span>
+    <span class="ticker-item">Kreatif Yönetim<span class="ticker-dot">✦</span></span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div>
+    <span class="about-label">Benim Hikayem</span>
+    <h2 class="about-heading">Merhaba, ben<br><em>Adın Soyadın</em></h2>
+    <p class="about-text">
+      İstanbul merkezli bir tasarımcı ve geliştirici olarak, anlamlı dijital deneyimler yaratmak için yaratıcılığı ve teknolojiyi bir araya getiriyorum. Minimalist estetiğe ve güçlü hikaye anlatımına inanıyorum.
+    </p>
+    <p class="about-text" style="margin-top: 18px;">
+      5+ yıldır markaların dijital kimliklerini şekillendiriyor, kullanıcıların hayatını kolaylaştıran ürünler tasarlıyorum.
+    </p>
+    <div class="about-stats">
+      <div>
+        <div class="stat-num">48+</div>
+        <div class="stat-label">Proje Tamamlandı</div>
+      </div>
+      <div>
+        <div class="stat-num">18+</div>
+        <div class="stat-label">Mutlu Müşteri</div>
+      </div>
+      <div>
+        <div class="stat-num">5</div>
+        <div class="stat-label">Yıl Deneyim</div>
+      </div>
+      <div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Ödül Kazanıldı</div>
+      </div>
+    </div>
+  </div>
+  <div class="about-img-wrap">
+    <!-- Kendi fotoğrafınızı buraya koyun: src="fotografiniz.jpg" -->
+    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" alt="Profil fotoğrafı" />
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header">
+    <span class="section-label">Seçili Çalışmalar</span>
+    <h2 class="section-title">Beni<br><em>Şekillendiren</em> Projeler</h2>
+    <div class="section-divider"></div>
+  </div>
+
+  <div class="projects-grid">
+
+    <!-- FEATURED -->
+    <div class="project-card featured" data-animate>
+      <img class="project-img"
+           src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=900&q=80"
+           alt="Proje 1"/>
+      <div class="project-overlay"></div>
+      <div class="project-info">
+        <span class="project-tag">Öne Çıkan — Branding</span>
+        <h3 class="project-title">Marka Kimliği & Görsel Sistem</h3>
+        <p class="project-desc">Lüks bir restoran zinciri için sıfırdan kurgulanmış kapsamlı bir marka kimliği. Logo, tipografi sistemi, ambalaj ve dijital varlıkları kapsıyor.</p>
+        <a href="#" class="project-link">Projeyi İncele</a>
+      </div>
+    </div>
+
+    <div class="project-card" data-animate>
+      <img class="project-img"
+           src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=700&q=80"
+           alt="Proje 2"/>
+      <div class="project-overlay"></div>
+      <div class="project-info">
+        <span class="project-tag">Mobil Uygulama</span>
+        <h3 class="project-title">Fintech Dashboard</h3>
+        <p class="project-desc">Kişisel finans takibi için sezgisel ve veri odaklı bir mobil uygulama tasarımı.</p>
+        <a href="#" class="project-link">İncele</a>
+      </div>
+    </div>
+
+    <div class="project-card" data-animate>
+      <img class="project-img"
+           src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=700&q=80"
+           alt="Proje 3"/>
+      <div class="project-overlay"></div>
+      <div class="project-info">
+        <span class="project-tag">Web Geliştirme</span>
+        <h3 class="project-title">E-ticaret Platformu</h3>
+        <p class="project-desc">Yüksek dönüşüm odaklı, hız optimize edilmiş bir e-ticaret sitesi. 3 ayda %220 satış artışı.</p>
+        <a href="#" class="project-link">İncele</a>
+      </div>
+    </div>
+
+    <div class="project-card" data-animate>
+      <img class="project-img"
+           src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=700&q=80"
+           alt="Proje 4"/>
+      <div class="project-overlay"></div>
+      <div class="project-info">
+        <span class="project-tag">Fotoğrafçılık</span>
+        <h3 class="project-title">Ürün Fotoğraf Serisi</h3>
+        <p class="project-desc">Bir kozmetik markası için stüdyo ve lokasyon çekimlerinden oluşan kapsamlı ürün serisi.</p>
+        <a href="#" class="project-link">İncele</a>
+      </div>
+    </div>
+
+    <div class="project-card" data-animate>
+      <img class="project-img"
+           src="https://images.unsplash.com/photo-1555421689-491a97ff2040?w=700&q=80"
+           alt="Proje 5"/>
+      <div class="project-overlay"></div>
+      <div class="project-info">
+        <span class="project-tag">UI / UX</span>
+        <h3 class="project-title">SaaS Yönetim Paneli</h3>
+        <p class="project-desc">Karmaşık veriyi sade ve kullanılabilir bir arayüzde sunan kurumsal yönetim paneli.</p>
+        <a href="#" class="project-link">İncele</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="skills-inner">
+    <div class="section-header" style="padding-bottom: 70px;">
+      <span class="section-label">Uzmanlıklar</span>
+      <h2 class="section-title">Ne <em>Yapıyorum?</em></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-item" data-animate-skill>
+        <span class="skill-icon">✦</span>
+        <div class="skill-name">UI / UX Tasarım</div>
+        <p class="skill-desc">Figma ile wireframe'den teslimata kadar kullanıcı odaklı arayüzler.</p>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w: 92%"></div></div>
+      </div>
+      <div class="skill-item" data-animate-skill>
+        <span class="skill-icon">◈</span>
+        <div class="skill-name">Frontend Geliştirme</div>
+        <p class="skill-desc">HTML, CSS, JS ve React ile canlı, hızlı web deneyimleri.</p>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w: 85%"></div></div>
+      </div>
+      <div class="skill-item" data-animate-skill>
+        <span class="skill-icon">◇</span>
+        <div class="skill-name">Branding</div>
+        <p class="skill-desc">Markaların hikayesini görsel kimliğe dönüştürüyorum.</p>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w: 78%"></div></div>
+      </div>
+      <div class="skill-item" data-animate-skill>
+        <span class="skill-icon">⬡</span>
+        <div class="skill-name">Motion Design</div>
+        <p class="skill-desc">After Effects ile ürün ve marka animasyonları, motion grafik.</p>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w: 70%"></div></div>
+      </div>
+      <div class="skill-item" data-animate-skill>
+        <span class="skill-icon">◉</span>
+        <div class="skill-name">Fotoğrafçılık</div>
+        <p class="skill-desc">Ürün, portre ve mimari fotoğrafçılık. Lightroom & Capture One.</p>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w: 80%"></div></div>
+      </div>
+      <div class="skill-item" data-animate-skill>
+        <span class="skill-icon">△</span>
+        <div class="skill-name">Strateji & Danışmanlık</div>
+        <p class="skill-desc">Dijital strateji, içerik planlaması ve marka konumlandırma.</p>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w: 75%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <span class="section-label" style="display:block; margin-bottom: 20px;">İletişim</span>
+    <h2 class="contact-title">Birlikte<br><em>Çalışalım</em></h2>
+    <p class="contact-sub">Yeni bir proje, fikir ya da sadece merhaba demek için dilediğin zaman yazabilirsin.</p>
+    <a href="mailto:siz@email.com" class="contact-email">siz@email.com</a>
+    <div class="contact-socials">
+      <a href="#" class="social-link">Instagram</a>
+      <a href="#" class="social-link">Behance</a>
+      <a href="#" class="social-link">Dribbble</a>
+      <a href="#" class="social-link">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-brand">Adın Soyadın</span>
+  <span class="footer-copy">© 2025 — Tüm hakları saklıdır</span>
+</footer>
+
+<script>
+  // ── CURSOR ──
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animateCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+    rx += (mx - rx) * .18;
+    ry += (my - ry) * .18;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%,-50%) scale(2.2)';
+      cursor.style.background = 'transparent';
+      cursor.style.border = '1px solid var(--gold)';
+      ring.style.opacity = '0';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+      cursor.style.background = 'var(--gold)';
+      cursor.style.border = 'none';
+      ring.style.opacity = '.6';
+    });
+  });
+
+  // ── NAV SCROLL ──
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // ── INTERSECTION OBSERVER (projects) ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
+
+  const skillObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        skillObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  document.querySelectorAll('[data-animate-skill]').forEach(el => skillObserver.observe(el));
+
+  // ── ABOUT SECTION FADE ──
+  const aboutObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('#about > div').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(40px)';
+    el.style.transition = 'opacity .8s ease, transform .8s ease';
+    aboutObs.observe(el);
+  });
+</script>
+</body>
+</html>
